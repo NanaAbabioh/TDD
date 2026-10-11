@@ -17,7 +17,7 @@ import { step } from '../model/track';
 import type { Attempt } from '../record/learningRecord';
 import type { Settings } from '../record/storage';
 import { numberWord, trainFeedback, trainPrompt } from '../voice/lines';
-import { playSound } from '../voice/sounds';
+import { AFTER_BELL, playSound } from '../voice/sounds';
 import { hush, say } from '../voice/speak';
 import { ChunkyButton } from './ChunkyButton';
 import { Confetti } from './Confetti';
@@ -116,6 +116,7 @@ export function TrainScene({ task, session, settings, progress, onFinish, onExit
     }
     if (delta === -1 && stats.commits === 0) stats.changesBeforeCommit++;
     stats.moves++;
+    playSound('chuff');
     setTrack(next);
     if (supports) speak(numberWord(next.position));
   };
@@ -147,9 +148,11 @@ export function TrainScene({ task, session, settings, progress, onFinish, onExit
       stats.firstGiven = result.given;
       stats.firstCorrect = result.correct;
     }
-    playSound(result.correct ? 'success' : 'retry');
+    // Arriving at the right stop is marked by the train's own whistle.
+    playSound('bell');
+    later(AFTER_BELL, () => playSound(result.correct ? 'whistle' : 'retry'));
     const line = trainFeedback(task, result.correct, result.given, progress.position + task.target);
-    later(result.correct ? 500 : 350, () => speak(line));
+    later(AFTER_BELL + (result.correct ? 1200 : 350), () => speak(line));
     setRevealed(true);
 
     if (!result.correct) {
@@ -159,7 +162,7 @@ export function TrainScene({ task, session, settings, progress, onFinish, onExit
       return;
     }
     setPhase('celebrate');
-    later(3800, finish);
+    later(5400, finish);
   };
 
   const replay = () => {
@@ -215,10 +218,10 @@ export function TrainScene({ task, session, settings, progress, onFinish, onExit
       </Animated.View>
 
       <View style={[styles.drive, { left, top: driveY }]}>
-        <ChunkyButton size={58} color="#fff" shade="#CFC7DE" label="Back one stop" onPress={() => drive(-1)} disabled={phase !== 'play'}>
+        <ChunkyButton size={58} color="#fff" shade="#CFC7DE" label="Back one stop" onPress={() => drive(-1)} disabled={phase !== 'play'} quiet>
           <ArrowIcon size={34} back />
         </ChunkyButton>
-        <ChunkyButton size={72} color={CORAL} shade="#C9492B" label="Forward one stop" onPress={() => drive(1)} disabled={phase !== 'play'}>
+        <ChunkyButton size={72} color={CORAL} shade="#C9492B" label="Forward one stop" onPress={() => drive(1)} disabled={phase !== 'play'} quiet>
           <ArrowIcon size={44} />
         </ChunkyButton>
       </View>

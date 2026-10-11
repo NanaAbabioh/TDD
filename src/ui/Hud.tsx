@@ -53,6 +53,7 @@ export function Hud({ left, top, bottom, captionWidth, captionLeft, caption, pro
         label="Ready"
         onPress={onCommit}
         disabled={bell.disabled}
+        quiet
         style={{ position: 'absolute', left: bell.x - bell.size / 2, top: bell.y - bell.size / 2 - 6 }}
       >
         <BellIcon size={bell.size * 0.62} />

@@ -16,6 +16,8 @@ type Props = {
   onLongPress?: () => void;
   delayLongPress?: number;
   disabled?: boolean;
+  // For a button that makes its own sound.
+  quiet?: boolean;
   style?: StyleProp<ViewStyle>;
   children: ReactNode;
 };
@@ -31,6 +33,7 @@ export function ChunkyButton({
   onLongPress,
   delayLongPress,
   disabled,
+  quiet,
   style,
   children,
 }: Props) {
@@ -38,7 +41,7 @@ export function ChunkyButton({
   return (
     <Pressable
       onPress={() => {
-        playSound('tap');
+        if (!quiet) playSound('tap');
         onPress?.();
       }}
       onLongPress={onLongPress}

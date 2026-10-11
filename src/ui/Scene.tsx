@@ -22,7 +22,7 @@ import {
 import type { Attempt } from '../record/learningRecord';
 import type { Settings } from '../record/storage';
 import { feedbackLine, numberWord, promptLine, stillLine } from '../voice/lines';
-import { playSound } from '../voice/sounds';
+import { AFTER_BELL, playSound } from '../voice/sounds';
 import { hush, say } from '../voice/speak';
 import { BellIcon, ContainerArt, HomeIcon, ItemArt, Mood, Plate, Seat, SpeakerIcon } from './art';
 import { ChunkyButton } from './ChunkyButton';
@@ -173,6 +173,7 @@ export function Scene({ task, session, settings, progress, onFinish, onExit }: P
   // The child decides when the amount is complete by ringing the bell.
   const commit = () => {
     if (phase !== 'play') return;
+    playSound('bell');
     if (task.skill === 'explore') return onFinish();
 
     const result = evaluate(task, collection);
@@ -181,10 +182,13 @@ export function Scene({ task, session, settings, progress, onFinish, onExit }: P
       stats.firstGiven = result.given;
       stats.firstCorrect = result.correct;
     }
-    // The sound lands first, then the voice says what the pairing shows.
-    playSound(result.correct ? 'success' : 'retry');
+    // The result sound follows the bell, then the voice says what the pairing shows.
+    later(AFTER_BELL, () => {
+      playSound(result.correct ? 'success' : 'retry');
+      if (result.correct) playSound('cheer');
+    });
     const line = feedbackLine(task, result, progress.position + task.quantity);
-    later(result.correct ? 500 : 350, () => speak(line));
+    later(AFTER_BELL + (result.correct ? 500 : 350), () => speak(line));
     if (makingSet) setPaired(true);
 
     if (!result.correct) {
@@ -195,13 +199,13 @@ export function Scene({ task, session, settings, progress, onFinish, onExit }: P
       return;
     }
     setPhase('celebrate');
-    later(4200, () => {
+    later(5600, () => {
       if (!makingSet) return finish();
       // Same items, new arrangement: the amount has not changed.
       setPaired(false);
       setPhase('spread');
       speak(stillLine(task));
-      later(2600, finish);
+      later(3000, finish);
     });
   };
 
@@ -396,6 +400,7 @@ export function Scene({ task, session, settings, progress, onFinish, onExit }: P
         label="Ready"
         onPress={commit}
         disabled={phase !== 'play'}
+        quiet
         style={{
           position: 'absolute',
           left: layout.bell.x - layout.bell.size / 2,

@@ -11,7 +11,7 @@ import { Hoard, TRAY_SIZE, addCoin, hoardTotal, pack, removeCoin, unpack } from 
 import type { Attempt } from '../record/learningRecord';
 import type { Settings } from '../record/storage';
 import { dragonFeedback, dragonPrompt, numberWord } from '../voice/lines';
-import { playSound } from '../voice/sounds';
+import { AFTER_BELL, Sound, playSound } from '../voice/sounds';
 import { hush, say } from '../voice/speak';
 import type { Mood } from './art';
 import { ChunkyButton } from './ChunkyButton';
@@ -94,14 +94,14 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
   const numeral = Math.min(height * 0.2, 84);
 
   // Each change goes through the model; a change that is not allowed does nothing.
-  const change = (next: Hoard, line?: string) => {
+  const change = (next: Hoard, line?: string, sound?: Sound) => {
     if (phase !== 'play') return;
     if (next === hoard) {
       stats.idleTaps++;
       return;
     }
     stats.changes++;
-    playSound(hoardTotal(next) < hoardTotal(hoard) ? 'pop' : 'plop');
+    playSound(sound ?? (hoardTotal(next) < hoardTotal(hoard) ? 'pop' : 'coin'));
     setHoard(next);
     if (supports) speak(line ?? numberWord(hoardTotal(next)));
   };
@@ -138,9 +138,13 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
       stats.firstGiven = result.given;
       stats.firstCorrect = result.correct;
     }
-    playSound(result.correct ? 'success' : 'retry');
+    playSound('bell');
+    later(AFTER_BELL, () => {
+      playSound(result.correct ? 'success' : 'retry');
+      if (result.correct) playSound('cheer');
+    });
     const line = dragonFeedback(task, result.correct, result.given, progress.position + task.target);
-    later(result.correct ? 500 : 350, () => speak(line));
+    later(AFTER_BELL + (result.correct ? 500 : 350), () => speak(line));
     setRevealed(true);
 
     if (!result.correct) {
@@ -150,7 +154,7 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
       return;
     }
     setPhase('celebrate');
-    later(4200, finish);
+    later(5600, finish);
   };
 
   const replay = () => {
@@ -217,7 +221,8 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
             shade="#D9981A"
             label="Close the ten into a chest"
             disabled={phase !== 'play'}
-            onPress={() => change(pack(hoard), `Ten ${task.treasure}. One chest!`)}
+            quiet
+            onPress={() => change(pack(hoard), `Ten ${task.treasure}. One chest!`, 'chest')}
           >
             <LidIcon size={44} />
           </ChunkyButton>
@@ -227,7 +232,7 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
       {Array.from({ length: hoard.chests }, (_, index) => (
         <Pressable
           key={index}
-          onPress={() => change(unpack(hoard), 'Ten again!')}
+          onPress={() => change(unpack(hoard), 'Ten again!', 'plop')}
           accessibilityLabel="Open the chest"
           style={{ position: 'absolute', left: trayX + index * (chestW + 10), top: shelfY }}
         >

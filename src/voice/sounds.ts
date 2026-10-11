@@ -2,7 +2,22 @@
 
 import { AudioPlayer, createAudioPlayer } from 'expo-audio';
 
-export type Sound = 'success' | 'retry' | 'pop' | 'plop' | 'tap' | 'fanfare';
+export type Sound =
+  | 'success'
+  | 'retry'
+  | 'pop'
+  | 'plop'
+  | 'tap'
+  | 'fanfare'
+  | 'bell'
+  | 'coin'
+  | 'chest'
+  | 'chuff'
+  | 'whistle'
+  | 'cheer';
+
+// The bell rings first; the result is heard once it has had a moment to sound.
+export const AFTER_BELL = 450;
 
 const SOURCES: Record<Sound, number> = {
   success: require('../../assets/sounds/success.wav'),
@@ -11,6 +26,12 @@ const SOURCES: Record<Sound, number> = {
   plop: require('../../assets/sounds/plop.wav'),
   tap: require('../../assets/sounds/tap.wav'),
   fanfare: require('../../assets/sounds/fanfare.wav'),
+  bell: require('../../assets/sounds/sfx-bell.wav'),
+  coin: require('../../assets/sounds/sfx-coin.wav'),
+  chest: require('../../assets/sounds/sfx-chest.wav'),
+  chuff: require('../../assets/sounds/sfx-chuff.wav'),
+  whistle: require('../../assets/sounds/sfx-whistle.wav'),
+  cheer: require('../../assets/sounds/sfx-cheer.wav'),
 };
 
 const players: Partial<Record<Sound, AudioPlayer>> = {};
