@@ -244,3 +244,48 @@ export function LidIcon({ size }: { size: number }) {
     </Svg>
   );
 }
+
+// Where the number path ends: a little station for the train, a nest for the dragon.
+export function GoalIcon({ size, nest }: { size: number; nest: boolean }) {
+  if (nest) {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 100 100">
+        <Ellipse cx={38} cy={50} rx={13} ry={17} fill={CREAM} stroke="#D9CBB4" strokeWidth={3} />
+        <Ellipse cx={62} cy={50} rx={13} ry={17} fill="#FFE9A8" stroke="#E2B95A" strokeWidth={3} />
+        <Path d="M10 56 Q50 104 90 56 Q70 68 50 66 Q30 68 10 56 Z" fill="#B97A45" stroke="#7A4A22" strokeWidth={4} strokeLinejoin="round" />
+        <Path d="M22 68 L38 74 M46 76 L62 76 M70 73 L80 66" stroke="#7A4A22" strokeWidth={3} strokeLinecap="round" />
+      </Svg>
+    );
+  }
+  return (
+    <Svg width={size} height={size} viewBox="0 0 100 100">
+      <Rect x={18} y={44} width={64} height={44} rx={5} fill={CREAM} stroke={INK} strokeWidth={4} />
+      <Path d="M8 48 L50 14 L92 48 Z" fill={CORAL} stroke={INK} strokeWidth={4} strokeLinejoin="round" />
+      <Rect x={41} y={60} width={18} height={28} rx={4} fill="#5B8DEF" stroke={INK} strokeWidth={3} />
+      <Circle cx={50} cy={36} r={7} fill="#fff" stroke={INK} strokeWidth={3} />
+    </Svg>
+  );
+}
+
+// The picture on the number path's door: three tiles counting up.
+export function PathArt({ size }: { size: number }) {
+  const tiles = [
+    { x: 6, y: 58, n: '1', fill: '#FFE27A' },
+    { x: 36, y: 34, n: '2', fill: '#FFC93C' },
+    { x: 66, y: 10, n: '3', fill: '#FF9C6B' },
+  ];
+  return (
+    <Svg width={size} height={size} viewBox="0 0 100 100">
+      <Path d="M20 72 L50 48 L80 24" stroke={INK} strokeWidth={5} strokeDasharray="2 9" strokeLinecap="round" fill="none" opacity={0.5} />
+      {tiles.map((tile) => (
+        <G key={tile.n}>
+          <Rect x={tile.x + 2} y={tile.y + 5} width={28} height={28} rx={8} fill={INK} opacity={0.25} />
+          <Rect x={tile.x} y={tile.y} width={28} height={28} rx={8} fill={tile.fill} stroke={INK} strokeWidth={3.5} />
+        </G>
+      ))}
+      <Path d="M17 67 L20 64 L20 80 M14 80 L26 80" stroke={INK} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <Path d="M44 44 Q50 36 56 43 Q56 48 44 57 L57 57" stroke={INK} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <Path d="M74 17 Q86 14 85 22 Q84 26 79 26 Q87 27 86 33 Q84 39 74 36" stroke={INK} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </Svg>
+  );
+}

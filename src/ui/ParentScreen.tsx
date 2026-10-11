@@ -70,6 +70,7 @@ function worldLines(
 
 const UP_TO_TEN = Array.from({ length: 10 }, (_, i) => i + 1);
 const FIVE_TO_NINETEEN = Array.from({ length: 15 }, (_, i) => i + 5);
+const PATH_ENDS = [5, 10, 20, 30, 50];
 
 export function ParentScreen({ save, onSettings, onReset, onBack }: Props) {
   const insets = useSafeAreaInsets();
@@ -127,6 +128,17 @@ export function ParentScreen({ save, onSettings, onReset, onBack }: Props) {
         thirteen is one chest and three more.
       </Text>
       {worldLines(attempts, 'hoard', FIVE_TO_NINETEEN, 'with the count showing').map((line) => (
+        <Text key={line} style={styles.body}>
+          {line}
+        </Text>
+      ))}
+
+      <Text style={styles.heading}>Number Path</Text>
+      <Text style={styles.body}>
+        Finding what comes next: laying a path from 0 by choosing, each time, the neighbouring
+        number that follows. The numbers below are where each path ended.
+      </Text>
+      {worldLines(attempts, 'path', PATH_ENDS, 'with easier wrong turns').map((line) => (
         <Text key={line} style={styles.body}>
           {line}
         </Text>

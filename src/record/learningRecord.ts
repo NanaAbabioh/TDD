@@ -4,8 +4,9 @@
 
 import type { Support } from '../activity/tasks';
 
-// match and make-set belong to the picnic, drive-to to the train, hoard to the dragon.
-export type AttemptSkill = 'match' | 'make-set' | 'drive-to' | 'hoard';
+// match and make-set belong to the picnic, drive-to to the train, hoard to the
+// dragon, path to the number path.
+export type AttemptSkill = 'match' | 'make-set' | 'drive-to' | 'hoard' | 'path';
 
 export type Attempt = {
   at: number;

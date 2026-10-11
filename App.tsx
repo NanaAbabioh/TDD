@@ -32,7 +32,8 @@ export default function App() {
   }, [soundOn]);
   useEffect(() => {
     if (!musicOn) return setMusic(undefined);
-    setMusic(screen === 'parents' ? 'home' : screen);
+    // The number path borrows the train's music.
+    setMusic(screen === 'parents' ? 'home' : screen === 'path' ? 'train' : screen);
   }, [musicOn, screen]);
 
   const update = (next: SaveData) => {

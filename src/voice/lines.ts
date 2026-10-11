@@ -3,6 +3,7 @@
 // caption, and can later be swapped for a recording without touching the game.
 
 import type { DragonTask } from '../activity/dragonGame';
+import type { PathTask } from '../activity/pathGame';
 import type { Result, Task, Theme } from '../activity/tasks';
 import type { TrainTask } from '../activity/trainGame';
 
@@ -12,8 +13,15 @@ const WORDS = [
   'nineteen', 'twenty',
 ];
 
+const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+
 export function numberWord(n: number): string {
-  return WORDS[n] ?? String(n);
+  if (WORDS[n]) return WORDS[n];
+  if (n < 100) {
+    const ones = n % 10;
+    return ones === 0 ? TENS[n / 10] : `${TENS[Math.floor(n / 10)]} ${WORDS[ones]}`;
+  }
+  return String(n);
 }
 
 const NOUNS: Record<Theme, { one: string; many: string; where: string; who: string; whos: string }> = {
@@ -98,10 +106,26 @@ export function dragonFeedback(task: DragonTask, correct: boolean, given: number
   return `${word} ${task.treasure}! ${praise}`;
 }
 
+const PLACES = { train: 'the station', dragon: 'the nest' };
+
+export function pathPrompt(task: PathTask): string {
+  const who = task.traveller === 'train' ? 'the train' : 'the dragon';
+  return `Help ${who} get to ${PLACES[task.traveller]}! Start at zero. What comes next?`;
+}
+
+export function pathAsk(reached: number): string {
+  return `Oops! What comes after ${numberWord(reached)}?`;
+}
+
+export function pathDone(task: PathTask, turn = 0): string {
+  return `${sentence(numberWord(task.last))}! You made it to ${PLACES[task.traveller]}! ${PRAISE[turn % PRAISE.length]}`;
+}
+
 export const DONE_LINES = {
   dino: 'Yay! The picnic is ready! See you next time!',
   train: 'All aboard! See you next time!',
   dragon: 'The dragon is so happy! See you next time!',
+  path: 'What a lot of counting! See you next time!',
 };
 
 // The home screen's welcome. Each world is named on its own, so its card can

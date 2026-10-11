@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { DRAGON_SESSION_LENGTH, DragonTask, nextDragonTask } from '../activity/dragonGame';
+import { PATH_SESSION_LENGTH, PathTask, nextPathTask } from '../activity/pathGame';
 import { nextTask, sessionLength } from '../activity/sequencer';
 import type { Task } from '../activity/tasks';
 import { TRAIN_SESSION_LENGTH, TrainTask, nextTrainTask } from '../activity/trainGame';
@@ -17,14 +18,15 @@ import { ChunkyButton } from './ChunkyButton';
 import { Confetti } from './Confetti';
 import { DinoActor } from './DinoActor';
 import { DragonScene } from './DragonScene';
+import { PathScene } from './PathScene';
 import { Scene } from './Scene';
 import { FONT, INK } from './theme';
 import { TrainScene } from './TrainScene';
 import { World } from './World';
 
-export type Game = 'dino' | 'train' | 'dragon';
+export type Game = 'dino' | 'train' | 'dragon' | 'path';
 
-type AnyTask = Task | TrainTask | DragonTask;
+type AnyTask = Task | TrainTask | DragonTask | PathTask;
 
 type Props = {
   game: Game;
@@ -36,6 +38,7 @@ type Props = {
 function taskFor(game: Game, attempts: readonly Attempt[], session: number, position: number): AnyTask {
   if (game === 'train') return nextTrainTask(attempts, session, position);
   if (game === 'dragon') return nextDragonTask(attempts, session, position);
+  if (game === 'path') return nextPathTask(attempts, session, position);
   return nextTask(attempts, session, position);
 }
 
@@ -48,7 +51,9 @@ export function PlayScreen({ game, save, onAttempt, onExit }: Props) {
       ? TRAIN_SESSION_LENGTH
       : game === 'dragon'
         ? DRAGON_SESSION_LENGTH
-        : sessionLength(session);
+        : game === 'path'
+          ? PATH_SESSION_LENGTH
+          : sessionLength(session);
   const [step, setStep] = useState(() => ({
     position: 0,
     task: taskFor(game, save.attempts, session, 0),
@@ -73,7 +78,7 @@ export function PlayScreen({ game, save, onAttempt, onExit }: Props) {
     return (
       <View style={styles.done}>
         <World
-          theme={game === 'dragon' ? 'dragon' : game === 'train' ? 'train' : 'cups'}
+          theme={game === 'dragon' ? 'dragon' : game === 'dino' ? 'cups' : 'train'}
           width={width}
           height={height}
           reducedMotion={calm}
@@ -87,7 +92,7 @@ export function PlayScreen({ game, save, onAttempt, onExit }: Props) {
               variant={variant}
               mood="happy"
               reducedMotion={calm}
-              dragon={game === 'dragon' && variant === 1}
+              dragon={(game === 'dragon' || game === 'path') && variant === 1}
             />
           ))}
         </View>
@@ -112,6 +117,9 @@ export function PlayScreen({ game, save, onAttempt, onExit }: Props) {
   }
   if (game === 'dragon') {
     return <DragonScene key={step.position} task={step.task as DragonTask} {...shared} />;
+  }
+  if (game === 'path') {
+    return <PathScene key={step.position} task={step.task as PathTask} {...shared} />;
   }
   return <Scene key={step.position} task={step.task as Task} {...shared} />;
 }

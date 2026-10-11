@@ -16,7 +16,8 @@ type Props = {
   captionLeft?: number;
   caption: string;
   progress: { position: number; length: number };
-  bell: { x: number; y: number; size: number; disabled: boolean };
+  // Left out in a game where every tap is its own answer.
+  bell?: { x: number; y: number; size: number; disabled: boolean };
   onExit: () => void;
   onReplay: () => void;
   onCommit: () => void;
@@ -46,18 +47,20 @@ export function Hud({ left, top, bottom, captionWidth, captionLeft, caption, pro
           </Text>
         </View>
       )}
-      <ChunkyButton
-        size={bell.size}
-        color={SUN}
-        shade="#D9981A"
-        label="Ready"
-        onPress={onCommit}
-        disabled={bell.disabled}
-        quiet
-        style={{ position: 'absolute', left: bell.x - bell.size / 2, top: bell.y - bell.size / 2 - 6 }}
-      >
-        <BellIcon size={bell.size * 0.62} />
-      </ChunkyButton>
+      {bell && (
+        <ChunkyButton
+          size={bell.size}
+          color={SUN}
+          shade="#D9981A"
+          label="Ready"
+          onPress={onCommit}
+          disabled={bell.disabled}
+          quiet
+          style={{ position: 'absolute', left: bell.x - bell.size / 2, top: bell.y - bell.size / 2 - 6 }}
+        >
+          <BellIcon size={bell.size * 0.62} />
+        </ChunkyButton>
+      )}
     </>
   );
 }

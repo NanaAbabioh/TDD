@@ -16,7 +16,7 @@ import { DinoActor } from './DinoActor';
 import type { Game } from './PlayScreen';
 import { FONT, INK } from './theme';
 import { World } from './World';
-import { Engine } from './worldArt';
+import { Engine, PathArt } from './worldArt';
 
 type Props = {
   reducedMotion: boolean;
@@ -94,13 +94,13 @@ function WorldCard({ label, color, shade, width, height, jumps, still, onPress, 
 let welcomed = false;
 
 export function HomeScreen({ reducedMotion, voice, onPlay, onParents }: Props) {
-  const [jumps, setJumps] = useState({ dino: 0, train: 0, dragon: 0 });
+  const [jumps, setJumps] = useState({ dino: 0, train: 0, dragon: 0, path: 0 });
 
   useEffect(() => {
     const jump = (game: Game) => setJumps((now) => ({ ...now, [game]: now[game] + 1 }));
     const waves: ReturnType<typeof setTimeout>[] = [];
     const everyone = () => {
-      (['dino', 'train', 'dragon'] as const).forEach((game, index) => {
+      (['dino', 'train', 'dragon', 'path'] as const).forEach((game, index) => {
         waves.push(setTimeout(() => jump(game), index * 160));
       });
     };
@@ -138,9 +138,9 @@ export function HomeScreen({ reducedMotion, voice, onPlay, onParents }: Props) {
 
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const cardW = Math.min((width - insets.left - insets.right) * 0.27, 250);
-  const cardH = Math.min(height * 0.56, cardW * 1.05);
-  const art = cardH * 0.66;
+  const cardW = Math.min((width - insets.left - insets.right) * 0.21, 230);
+  const cardH = Math.min(height * 0.56, cardW * 1.2);
+  const art = Math.min(cardH * 0.62, cardW * 0.8);
   const titleSize = Math.min(height * 0.115, width * 0.052);
 
   return (
@@ -152,7 +152,7 @@ export function HomeScreen({ reducedMotion, voice, onPlay, onParents }: Props) {
         </Text>
         <Text style={[styles.title, { fontSize: titleSize }]}>Trains, Dragons & Dinosaurs</Text>
       </View>
-      <View style={[styles.row, { gap: width * 0.03 }]}>
+      <View style={[styles.row, { gap: width * 0.022 }]}>
         <WorldCard label="Dino Picnic" color="#BFEBAE" shade="#6FB868" width={cardW} height={cardH} jumps={jumps.dino} still={reducedMotion} onPress={() => onPlay('dino')}>
           <DinoActor size={art} variant={0} mood="idle" reducedMotion={reducedMotion} />
         </WorldCard>
@@ -161,6 +161,9 @@ export function HomeScreen({ reducedMotion, voice, onPlay, onParents }: Props) {
         </WorldCard>
         <WorldCard label="Dragon Hoard" color="#DCCBF5" shade="#9478CC" width={cardW} height={cardH} jumps={jumps.dragon} still={reducedMotion} onPress={() => onPlay('dragon')}>
           <DinoActor size={art} variant={1} mood="idle" reducedMotion={reducedMotion} dragon />
+        </WorldCard>
+        <WorldCard label="Number Path" color="#FFE3B8" shade="#E0A04E" width={cardW} height={cardH} jumps={jumps.path} still={reducedMotion} onPress={() => onPlay('path')}>
+          <PathArt size={art * 0.9} />
         </WorldCard>
       </View>
       {/* A long press keeps small hands out of the grown-ups' area. */}
@@ -187,10 +190,10 @@ const styles = StyleSheet.create({
   picture: { flex: 1, alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' },
   label: {
     fontFamily: FONT.semi,
-    fontSize: 17,
+    fontSize: 15,
     color: INK,
     paddingVertical: 3,
-    paddingHorizontal: 14,
+    paddingHorizontal: 10,
     borderRadius: 14,
     overflow: 'hidden',
     backgroundColor: 'rgba(255,255,255,0.8)',
