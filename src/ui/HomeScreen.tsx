@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { playSound } from '../voice/sounds';
 import { DinoActor } from './DinoActor';
 import type { Game } from './PlayScreen';
 import { FONT, INK } from './theme';
@@ -26,7 +27,10 @@ const DEPTH = 8;
 function WorldCard({ label, color, shade, width, height, onPress, children }: CardProps) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        playSound('tap');
+        onPress();
+      }}
       accessibilityLabel={label}
       accessibilityRole="button"
       style={{ width, height: height + DEPTH }}

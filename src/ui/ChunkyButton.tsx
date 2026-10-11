@@ -4,6 +4,7 @@
 import { ReactNode } from 'react';
 import { Pressable, StyleProp, View, ViewStyle } from 'react-native';
 
+import { playSound } from '../voice/sounds';
 import { INK } from './theme';
 
 type Props = {
@@ -36,7 +37,10 @@ export function ChunkyButton({
   const round = { width: size, height: size, borderRadius: size / 2, borderWidth: 3, borderColor: INK };
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        playSound('tap');
+        onPress?.();
+      }}
       onLongPress={onLongPress}
       delayLongPress={delayLongPress}
       disabled={disabled}

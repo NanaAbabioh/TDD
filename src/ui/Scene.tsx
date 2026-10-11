@@ -117,6 +117,8 @@ export function Scene({ task, session, settings, progress, onFinish, onExit }: P
       return;
     }
     if (to?.kind === 'supply' && stats.commits === 0) stats.changesBeforeCommit++;
+    // A soft drop when something is placed, a pop when it is taken back.
+    playSound(to?.kind === 'supply' ? 'pop' : 'plop');
     setCollection(next);
     if (makingSet && supports && to?.kind === 'container') {
       speak(numberWord(countIn(next, 'container')));
@@ -180,7 +182,7 @@ export function Scene({ task, session, settings, progress, onFinish, onExit }: P
       stats.firstCorrect = result.correct;
     }
     // The sound lands first, then the voice says what the pairing shows.
-    playSound(result.correct ? 'success' : 'retry', settings.sound);
+    playSound(result.correct ? 'success' : 'retry');
     const line = feedbackLine(task, result, progress.position + task.quantity);
     later(result.correct ? 500 : 350, () => speak(line));
     if (makingSet) setPaired(true);

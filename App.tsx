@@ -8,6 +8,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import type { Attempt } from './src/record/learningRecord';
 import { SaveData, Settings, emptySave, loadSave, writeSave } from './src/record/storage';
 import { HomeScreen } from './src/ui/HomeScreen';
+import { setMusic } from './src/voice/music';
+import { setSoundEnabled } from './src/voice/sounds';
 import { ParentScreen } from './src/ui/ParentScreen';
 import { Game, PlayScreen } from './src/ui/PlayScreen';
 
@@ -21,6 +23,17 @@ export default function App() {
   useEffect(() => {
     loadSave().then(setSave);
   }, []);
+
+  // Each world has its own track; the home and grown-ups' screens share one.
+  const musicOn = save?.settings.music;
+  const soundOn = save?.settings.sound;
+  useEffect(() => {
+    setSoundEnabled(soundOn ?? true);
+  }, [soundOn]);
+  useEffect(() => {
+    if (!musicOn) return setMusic(undefined);
+    setMusic(screen === 'parents' ? 'home' : screen);
+  }, [musicOn, screen]);
 
   const update = (next: SaveData) => {
     setSave(next);

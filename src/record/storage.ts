@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import type { Attempt } from './learningRecord';
 
-export type Settings = { voice: boolean; sound: boolean; reducedMotion: boolean };
+export type Settings = { voice: boolean; sound: boolean; music: boolean; reducedMotion: boolean };
 
 export type SaveData = {
   version: 1;
@@ -18,7 +18,7 @@ const KEY = 'tdd.save';
 const BACKUP_KEY = 'tdd.save.backup';
 
 export function emptySave(): SaveData {
-  return { version: 1, sessions: 0, attempts: [], settings: { voice: true, sound: true, reducedMotion: false } };
+  return { version: 1, sessions: 0, attempts: [], settings: { voice: true, sound: true, music: true, reducedMotion: false } };
 }
 
 function parse(raw: string | null): SaveData | undefined {

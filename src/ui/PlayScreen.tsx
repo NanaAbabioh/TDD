@@ -10,6 +10,7 @@ import { TRAIN_SESSION_LENGTH, TrainTask, nextTrainTask } from '../activity/trai
 import type { Attempt } from '../record/learningRecord';
 import type { SaveData } from '../record/storage';
 import { DONE_LINES } from '../voice/lines';
+import { playSound } from '../voice/sounds';
 import { say } from '../voice/speak';
 import { HomeIcon } from './art';
 import { ChunkyButton } from './ChunkyButton';
@@ -55,7 +56,9 @@ export function PlayScreen({ game, save, onAttempt, onExit }: Props) {
   const done = step.position >= length;
 
   useEffect(() => {
-    if (done) say(DONE_LINES[game], save.settings.voice);
+    if (!done) return;
+    playSound('fanfare');
+    say(DONE_LINES[game], save.settings.voice);
   }, [done]);
 
   const advance = (attempt?: Attempt) => {

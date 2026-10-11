@@ -151,6 +151,10 @@ export function ParentScreen({ save, onSettings, onReset, onBack }: Props) {
         <Switch value={settings.sound} onValueChange={(sound) => onSettings({ ...settings, sound })} />
       </View>
       <View style={styles.setting}>
+        <Text style={styles.body}>Music</Text>
+        <Switch value={settings.music} onValueChange={(music) => onSettings({ ...settings, music })} />
+      </View>
+      <View style={styles.setting}>
         <Text style={styles.body}>Reduce motion</Text>
         <Switch
           value={settings.reducedMotion}

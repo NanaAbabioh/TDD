@@ -101,6 +101,7 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
       return;
     }
     stats.changes++;
+    playSound(hoardTotal(next) < hoardTotal(hoard) ? 'pop' : 'plop');
     setHoard(next);
     if (supports) speak(line ?? numberWord(hoardTotal(next)));
   };
@@ -137,7 +138,7 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
       stats.firstGiven = result.given;
       stats.firstCorrect = result.correct;
     }
-    playSound(result.correct ? 'success' : 'retry', settings.sound);
+    playSound(result.correct ? 'success' : 'retry');
     const line = dragonFeedback(task, result.correct, result.given, progress.position + task.target);
     later(result.correct ? 500 : 350, () => speak(line));
     setRevealed(true);

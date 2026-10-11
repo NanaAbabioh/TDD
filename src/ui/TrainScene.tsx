@@ -147,7 +147,7 @@ export function TrainScene({ task, session, settings, progress, onFinish, onExit
       stats.firstGiven = result.given;
       stats.firstCorrect = result.correct;
     }
-    playSound(result.correct ? 'success' : 'retry', settings.sound);
+    playSound(result.correct ? 'success' : 'retry');
     const line = trainFeedback(task, result.correct, result.given, progress.position + task.target);
     later(result.correct ? 500 : 350, () => speak(line));
     setRevealed(true);
