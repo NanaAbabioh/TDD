@@ -1,11 +1,11 @@
-// Placeholder voice: the device's own text-to-speech, pitched up and a little
-// quicker so it sounds young. A recorded child's voice can replace it later.
+// Placeholder voice: the device's own text-to-speech, pitched up so it sounds
+// young and slowed down so each number word is easy to catch. A recorded child's voice can replace it later.
 
 import * as Speech from 'expo-speech';
 
 import { duckMusic } from './music';
 
-const VOICE = { language: 'en-US', rate: 0.95, pitch: 1.6 };
+const VOICE = { language: 'en-US', rate: 0.75, pitch: 1.6 };
 
 let quietUntil: ReturnType<typeof setTimeout> | undefined;
 // Bumped whenever something new is said, which stops any running sequence.
@@ -16,7 +16,7 @@ let turn = 0;
 function holdMusicDown(text: string): void {
   duckMusic(true);
   clearTimeout(quietUntil);
-  quietUntil = setTimeout(() => duckMusic(false), 900 + text.length * 85);
+  quietUntil = setTimeout(() => duckMusic(false), 1000 + text.length * 110);
 }
 
 function letMusicUp(): void {
@@ -66,7 +66,7 @@ export function saySequence(steps: Step[], enabled: boolean): () => void {
     holdMusicDown(step.text);
     Speech.speak(step.text, { ...VOICE, onDone: next, onError: next });
     // In case the device never reports that the words finished.
-    timer = setTimeout(next, 1400 + step.text.length * 110);
+    timer = setTimeout(next, 1600 + step.text.length * 150);
   };
   run(0);
 
