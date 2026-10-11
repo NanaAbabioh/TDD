@@ -217,7 +217,7 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
             shade="#D9981A"
             label="Close the ten into a chest"
             disabled={phase !== 'play'}
-            onPress={() => change(pack(hoard), `Ten ${task.treasure}. One chest.`)}
+            onPress={() => change(pack(hoard), `Ten ${task.treasure}. One chest!`)}
           >
             <LidIcon size={44} />
           </ChunkyButton>
@@ -227,7 +227,7 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
       {Array.from({ length: hoard.chests }, (_, index) => (
         <Pressable
           key={index}
-          onPress={() => change(unpack(hoard), 'Ten again.')}
+          onPress={() => change(unpack(hoard), 'Ten again!')}
           accessibilityLabel="Open the chest"
           style={{ position: 'absolute', left: trayX + index * (chestW + 10), top: shelfY }}
         >

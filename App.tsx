@@ -60,6 +60,7 @@ export default function App() {
         {ready && screen === 'home' && (
           <HomeScreen
             reducedMotion={save.settings.reducedMotion}
+            voice={save.settings.voice}
             onPlay={setScreen}
             onParents={() => setScreen('parents')}
           />

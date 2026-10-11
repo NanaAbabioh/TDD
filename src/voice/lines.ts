@@ -1,4 +1,5 @@
-// Every spoken prompt, kept short and reusable. Each line is also shown as a
+// Every spoken prompt, kept short and reusable. The speaker is a child talking
+// to another child: playful, but the number words stay exact. Each line is also shown as a
 // caption, and can later be swapped for a recording without touching the game.
 
 import type { DragonTask } from '../activity/dragonGame';
@@ -31,13 +32,14 @@ export function sentence(text: string): string {
 }
 
 export function promptLine(task: Task): string {
-  if (task.skill === 'explore') return 'Move the leaves. Ring the bell when you are done.';
-  if (task.skill === 'match') return 'Give each dinosaur one leaf.';
-  return `Put ${amount(task.quantity, task.theme)} ${NOUNS[task.theme].where}.`;
+  if (task.skill === 'explore') return "Let's play! Move the leaves around. Ring the bell when you're done!";
+  if (task.skill === 'match') return 'Can you give every dinosaur one leaf?';
+  return `Can you put ${amount(task.quantity, task.theme)} ${NOUNS[task.theme].where}?`;
 }
 
 // Praise names the achievement, not the child's ability, and varies a little.
-export const PRAISE = ['You did it!', 'Well done!', 'That is it!', 'You got it!'];
+export const PRAISE = ['Yay, you did it!', 'Woohoo, well done!', "Wow, that's it!", 'Yes! You got it!'];
+const RETRY = 'Oops, not quite!';
 
 // What the pairing shows, said plainly.
 function revealLine(task: Task, result: Result): string {
@@ -67,28 +69,28 @@ function revealLine(task: Task, result: Result): string {
 export function feedbackLine(task: Task, result: Result, turn = 0): string {
   const reveal = revealLine(task, result);
   if (result.correct) return `${reveal} ${PRAISE[turn % PRAISE.length]}`;
-  return `Not quite. ${reveal} Try again.`;
+  return `${RETRY} ${reveal} Try again!`;
 }
 
 export function stillLine(task: Task): string {
-  return `Still ${amount(task.quantity, task.theme)}.`;
+  return `Look! Still ${amount(task.quantity, task.theme)}!`;
 }
 
 export function trainPrompt(task: TrainTask): string {
-  return `Drive the train to stop ${numberWord(task.target)}.`;
+  return `Can you drive the train to stop ${numberWord(task.target)}?`;
 }
 
 export function trainFeedback(task: TrainTask, correct: boolean, given: number, turn = 0): string {
   if (correct) return `Stop ${numberWord(task.target)}! ${PRAISE[turn % PRAISE.length]}`;
-  return `Not quite. This is stop ${numberWord(given)}. Try again.`;
+  return `${RETRY} This is stop ${numberWord(given)}. Try again!`;
 }
 
 export function dragonPrompt(task: DragonTask): string {
-  return `Give the dragon ${numberWord(task.target)} ${task.treasure}.`;
+  return `Can you give the dragon ${numberWord(task.target)} ${task.treasure}?`;
 }
 
 export function dragonFeedback(task: DragonTask, correct: boolean, given: number, turn = 0): string {
-  if (!correct) return `Not quite. That is ${numberWord(given)}. Try again.`;
+  if (!correct) return `${RETRY} That is ${numberWord(given)}. Try again!`;
   const praise = PRAISE[turn % PRAISE.length];
   const word = sentence(numberWord(task.target));
   // A teen number is said as its ten and its ones first.
@@ -97,7 +99,17 @@ export function dragonFeedback(task: DragonTask, correct: boolean, given: number
 }
 
 export const DONE_LINES = {
-  dino: 'The picnic is ready. See you next time!',
+  dino: 'Yay! The picnic is ready! See you next time!',
   train: 'All aboard! See you next time!',
-  dragon: 'The dragon is happy. See you next time!',
+  dragon: 'The dragon is so happy! See you next time!',
+};
+
+// The home screen's welcome. Each world is named on its own, so its card can
+// jump as the word is said.
+export const WELCOME = {
+  hello: 'Welcome to',
+  train: 'Trains,',
+  dragon: 'Dragons,',
+  dino: 'and Dinosaurs!',
+  choose: 'Choose a game to play!',
 };
