@@ -17,6 +17,7 @@ import { ChunkyButton } from './ChunkyButton';
 import { Confetti } from './Confetti';
 import { Hud } from './Hud';
 import { NumberPop } from './NumberPop';
+import { useUiScale } from './scale';
 import { CORAL, FONT, INK, SUN } from './theme';
 import { World } from './World';
 import { TreasureArt } from './worldArt';
@@ -32,7 +33,6 @@ type Props = {
   onExit: () => void;
 };
 
-const BELL = 76;
 const SCENE = { dino: 'leaves', train: 'train', dragon: 'dragon' } as const;
 const COVER = { dino: '#5FB868', train: '#6FA3DB', dragon: '#9478CC' };
 // How long the second group stays in view before it is hidden, when playing without help.
@@ -43,6 +43,8 @@ export function AddScene({ task, session, settings, progress, onFinish, onExit }
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const calm = settings.reducedMotion;
+  const s = useUiScale();
+  const BELL = 76 * s;
   const total = task.first + task.more;
 
   const [phase, setPhase] = useState<Phase>('play');
@@ -80,14 +82,18 @@ export function AddScene({ task, session, settings, progress, onFinish, onExit }
 
   const left = insets.left + 12;
   const right = width - insets.right - 12;
-  const top = insets.top + 66;
+  const top = insets.top + 66 * s;
   const bottom = height - insets.bottom - 12;
-  const strip = Math.min(52, (right - left - BELL - 24 - (task.top - 1) * 8) / task.top);
+  const strip = Math.min(52 * s, (right - left - BELL - 24 - (task.top - 1) * 8) / task.top);
   const zoneBottom = bottom - strip - 22;
-  const zoneGap = 28;
+  // The gap between the two groups holds the plus sign.
+  const plus = Math.min(76 * s, (right - left) * 0.1);
+  const zoneGap = plus + 20;
   const zoneW = (right - left - zoneGap) / 2;
   const zoneH = zoneBottom - top;
-  const item = Math.min(zoneH * 0.44, zoneW / 5.5, 76);
+  // Small groups are drawn larger; a row never holds more than five.
+  const widest = Math.min(5, Math.max(task.first, task.more));
+  const item = Math.min(zoneH * 0.44, zoneW / (widest + 0.9), 100 * s);
 
   // Where the item at this position in its group sits: rows of five, centred.
   const spot = (group: 0 | 1, order: number, size: number) => {
@@ -198,6 +204,22 @@ export function AddScene({ task, session, settings, progress, onFinish, onExit }
         />
       ))}
 
+      {/* The plus sign: these and those, put together. */}
+      <View
+        style={[
+          styles.plus,
+          {
+            left: left + zoneW + (zoneGap - plus) / 2,
+            top: top + zoneH / 2 - plus / 2,
+            width: plus,
+            height: plus,
+            borderRadius: plus / 2,
+          },
+        ]}
+      >
+        <Text style={[styles.plusText, { fontSize: plus * 0.86, lineHeight: plus * 0.98 }]}>+</Text>
+      </View>
+
       {Array.from({ length: total }, (_, id) => {
         const at = spotOf(id);
         const second = id >= task.first;
@@ -267,9 +289,9 @@ export function AddScene({ task, session, settings, progress, onFinish, onExit }
       {phase === 'celebrate' && (
         <Animated.View
           entering={calm ? undefined : ZoomIn.duration(280)}
-          style={[styles.sum, { top: bottom - 84, left: (left + right - BELL) / 2 - 150 }]}
+          style={[styles.sum, { top: bottom - 84 * s, left: (left + right - BELL) / 2 - 150 * s, width: 300 * s }]}
         >
-          <Text style={styles.sumText}>
+          <Text style={[styles.sumText, { fontSize: 56 * s, lineHeight: 72 * s }]}>
             {task.first} + {task.more} = {total}
           </Text>
         </Animated.View>
@@ -280,8 +302,8 @@ export function AddScene({ task, session, settings, progress, onFinish, onExit }
       <Hud
         left={left}
         top={insets.top + 6}
-        bottom={height - (insets.top + 12 + 38)}
-        captionLeft={left + 216}
+        bottom={height - (insets.top + 12 + 38 * s)}
+        captionLeft={left + 216 * s}
         captionWidth={width * 0.55}
         caption={caption}
         progress={progress}
@@ -315,7 +337,6 @@ const styles = StyleSheet.create({
   coverText: { fontFamily: FONT.bold, color: '#fff', textAlign: 'center' },
   sum: {
     position: 'absolute',
-    width: 300,
     alignItems: 'center',
     paddingVertical: 4,
     borderRadius: 28,
@@ -325,6 +346,16 @@ const styles = StyleSheet.create({
     pointerEvents: 'none',
   },
   sumText: { fontFamily: FONT.bold, fontSize: 56, lineHeight: 72, color: INK },
+  plus: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 4,
+    borderColor: INK,
+    backgroundColor: '#fff',
+    pointerEvents: 'none',
+  },
+  plusText: { fontFamily: FONT.bold, color: CORAL, textAlign: 'center' },
   strip: { position: 'absolute', flexDirection: 'row', alignItems: 'flex-end' },
   stripText: { fontFamily: FONT.bold, color: INK, textAlign: 'center' },
 });

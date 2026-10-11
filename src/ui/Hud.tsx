@@ -5,6 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { BellIcon, HomeIcon, SpeakerIcon } from './art';
 import { ChunkyButton } from './ChunkyButton';
+import { useUiScale } from './scale';
 import { FONT, INK, SUN } from './theme';
 
 type Props = {
@@ -24,25 +25,27 @@ type Props = {
 };
 
 export function Hud({ left, top, bottom, captionWidth, captionLeft, caption, progress, bell, onExit, onReplay, onCommit }: Props) {
+  const s = useUiScale();
+  const pip = { width: 10 * s, height: 10 * s, borderRadius: 5 * s };
   return (
     <>
-      <View style={[styles.topBar, { top, left }]}>
-        <ChunkyButton size={40} color="#fff" shade="#CFC7DE" label="Home" onPress={onExit}>
-          <HomeIcon size={22} />
+      <View style={[styles.topBar, { top, left, gap: 10 * s }]}>
+        <ChunkyButton size={40 * s} color="#fff" shade="#CFC7DE" label="Home" onPress={onExit}>
+          <HomeIcon size={22 * s} />
         </ChunkyButton>
-        <ChunkyButton size={48} color="#fff" shade="#CFC7DE" label="Say it again" onPress={onReplay}>
-          <SpeakerIcon size={28} />
+        <ChunkyButton size={48 * s} color="#fff" shade="#CFC7DE" label="Say it again" onPress={onReplay}>
+          <SpeakerIcon size={28 * s} />
         </ChunkyButton>
         <View style={styles.pips}>
           {Array.from({ length: progress.length }, (_, index) => (
-            <View key={index} style={[styles.pip, index < progress.position && styles.pipDone]} />
+            <View key={index} style={[styles.pip, pip, index < progress.position && styles.pipDone]} />
           ))}
         </View>
       </View>
       {/* Captions are for the adult; the child hears the line and reads the scene. */}
       {caption !== '' && (
         <View style={[styles.captionRow, { left: captionLeft ?? left, width: captionWidth, bottom }]}>
-          <Text style={styles.caption} numberOfLines={2}>
+          <Text style={[styles.caption, { fontSize: 12 * s, lineHeight: 15 * s }]} numberOfLines={2}>
             {caption}
           </Text>
         </View>

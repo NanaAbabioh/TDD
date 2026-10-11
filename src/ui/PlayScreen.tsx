@@ -21,6 +21,7 @@ import { Confetti } from './Confetti';
 import { DinoActor } from './DinoActor';
 import { DragonScene } from './DragonScene';
 import { PathScene } from './PathScene';
+import { useUiScale } from './scale';
 import { Scene } from './Scene';
 import { FONT, INK } from './theme';
 import { TrainScene } from './TrainScene';
@@ -57,6 +58,7 @@ function taskFor(
 export function PlayScreen({ world, game, save, onAttempt, onExit }: Props) {
   const { width, height } = useWindowDimensions();
   const calm = save.settings.reducedMotion;
+  const s = useUiScale();
   const session = useRef(save.sessions + 1).current;
   const length =
     game === 'train'
@@ -110,9 +112,9 @@ export function PlayScreen({ world, game, save, onAttempt, onExit }: Props) {
             />
           ))}
         </View>
-        <Text style={styles.caption}>{DONE_LINES[game]}</Text>
-        <ChunkyButton size={84} color="#fff" shade="#CFC7DE" label="Home" onPress={onExit}>
-          <HomeIcon size={44} />
+        <Text style={[styles.caption, { fontSize: 20 * s }]}>{DONE_LINES[game]}</Text>
+        <ChunkyButton size={84 * s} color="#fff" shade="#CFC7DE" label="Home" onPress={onExit}>
+          <HomeIcon size={44 * s} />
         </ChunkyButton>
         {!calm && <Confetti x={width / 2} y={height * 0.3} spread={height * 0.7} />}
       </View>

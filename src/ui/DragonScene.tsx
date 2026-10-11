@@ -19,6 +19,7 @@ import { Confetti } from './Confetti';
 import { DinoActor } from './DinoActor';
 import { Hud } from './Hud';
 import { NumberPop } from './NumberPop';
+import { useUiScale } from './scale';
 import { SUN } from './theme';
 import { World } from './World';
 import { Chest, LidIcon, Pile, TreasureArt } from './worldArt';
@@ -34,12 +35,12 @@ type Props = {
   onExit: () => void;
 };
 
-const BELL = 76;
-
 export function DragonScene({ task, session, settings, progress, onFinish, onExit }: Props) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const calm = settings.reducedMotion;
+  const s = useUiScale();
+  const BELL = 76 * s;
 
   const [hoard, setHoard] = useState(startHoard);
   const [phase, setPhase] = useState<Phase>('play');
@@ -82,16 +83,18 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
   const right = width - insets.right - 12;
   const top = insets.top + 12;
   const bottom = height - insets.bottom - 12;
-  const cell = Math.min(height * 0.17, width * 0.085);
+  const cell = Math.min(height * 0.17, width * 0.1);
   const trayW = cell * 5 + 20;
   const trayH = cell * 2 + 20;
   const trayX = left + width * 0.2;
-  const trayY = bottom - trayH - 6;
-  const pileSize = Math.min(height * 0.36, width * 0.17);
   const chestW = cell * 1.55;
-  const shelfY = top + 58;
+  const shelfY = top + 58 * s;
+  // On a tall screen the tray rises towards the middle instead of hugging the bottom edge.
+  const spare = Math.max(0, bottom - shelfY - chestW * 0.78 - trayH - 30);
+  const trayY = bottom - trayH - 6 - spare * 0.45;
+  const pileSize = Math.min(height * 0.36, width * 0.17);
   const dragon = Math.min(height * 0.46, width * 0.23);
-  const numeral = Math.min(height * 0.2, 84);
+  const numeral = Math.min(height * 0.2, 84 * s);
 
   // Each change goes through the model; a change that is not allowed does nothing.
   const change = (next: Hoard, line?: string, sound?: Sound) => {
@@ -213,10 +216,10 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
       {hoard.tray === TRAY_SIZE && (
         <Animated.View
           entering={calm ? undefined : ZoomIn.duration(220)}
-          style={{ position: 'absolute', left: trayX + trayW + 12, top: trayY + trayH / 2 - 38 }}
+          style={{ position: 'absolute', left: trayX + trayW + 12, top: trayY + trayH / 2 - 38 * s }}
         >
           <ChunkyButton
-            size={68}
+            size={68 * s}
             color={SUN}
             shade="#D9981A"
             label="Close the ten into a chest"
@@ -224,7 +227,7 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
             quiet
             onPress={() => change(pack(hoard), `Ten ${task.treasure}. One chest!`, 'chest')}
           >
-            <LidIcon size={44} />
+            <LidIcon size={44 * s} />
           </ChunkyButton>
         </Animated.View>
       )}
@@ -255,7 +258,7 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
           burst={1.9}
           reducedMotion={calm}
           tone={wrongShown ? 'alert' : 'sun'}
-          style={{ left: right - dragon - numeral - 26, top: top + 52 }}
+          style={{ left: right - dragon - numeral - 26, top: top + 52 * s }}
         />
       )}
 
@@ -266,7 +269,7 @@ export function DragonScene({ task, session, settings, progress, onFinish, onExi
       <Hud
         left={left}
         top={insets.top + 6}
-        bottom={height - (insets.top + 66 + 38)}
+        bottom={height - (insets.top + (66 + 38) * s)}
         captionWidth={width * 0.19}
         caption={caption}
         progress={progress}

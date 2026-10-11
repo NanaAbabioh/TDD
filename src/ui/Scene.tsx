@@ -31,6 +31,7 @@ import { DinoActor } from './DinoActor';
 import { Point, layoutScene } from './layout';
 import { NumberPop } from './NumberPop';
 import { Piece, Release } from './Piece';
+import { useUiScale } from './scale';
 import { CORAL, CREAM, FONT, INK, SUN } from './theme';
 import { World } from './World';
 
@@ -219,6 +220,7 @@ export function Scene({ task, session, settings, progress, onFinish, onExit }: P
     return isWaiting(index) ? 'waiting' : 'idle';
   };
   const calm = settings.reducedMotion;
+  const s = useUiScale();
 
   // Whenever the game counts aloud, each counted item wears its number, so the
   // spoken word, the numeral and the object arrive together.
@@ -366,16 +368,23 @@ export function Scene({ task, session, settings, progress, onFinish, onExit }: P
         <Confetti x={rowCentre.x} y={rowCentre.y} spread={height * 0.5} />
       )}
 
-      <View style={[styles.topBar, { top: insets.top + 6, left: layout.supply.x }]}>
-        <ChunkyButton size={40} color="#fff" shade="#CFC7DE" label="Home" onPress={onExit}>
-          <HomeIcon size={22} />
+      <View style={[styles.topBar, { top: insets.top + 6, left: layout.supply.x, gap: 10 * s }]}>
+        <ChunkyButton size={40 * s} color="#fff" shade="#CFC7DE" label="Home" onPress={onExit}>
+          <HomeIcon size={22 * s} />
         </ChunkyButton>
-        <ChunkyButton size={48} color="#fff" shade="#CFC7DE" label="Say it again" onPress={replay}>
-          <SpeakerIcon size={28} />
+        <ChunkyButton size={48 * s} color="#fff" shade="#CFC7DE" label="Say it again" onPress={replay}>
+          <SpeakerIcon size={28 * s} />
         </ChunkyButton>
         <View style={styles.pips}>
           {Array.from({ length: progress.length }, (_, index) => (
-            <View key={index} style={[styles.pip, index < progress.position && styles.pipDone]} />
+            <View
+              key={index}
+              style={[
+                styles.pip,
+                { width: 10 * s, height: 10 * s, borderRadius: 5 * s },
+                index < progress.position && styles.pipDone,
+              ]}
+            />
           ))}
         </View>
       </View>
@@ -387,7 +396,7 @@ export function Scene({ task, session, settings, progress, onFinish, onExit }: P
             { left: layout.supply.x, width: layout.supply.w, bottom: insets.bottom + 8 },
           ]}
         >
-          <Text style={styles.caption} numberOfLines={2}>
+          <Text style={[styles.caption, { fontSize: 12 * s, lineHeight: 15 * s }]} numberOfLines={2}>
             {caption}
           </Text>
         </View>

@@ -23,6 +23,7 @@ import { ChunkyButton } from './ChunkyButton';
 import { Confetti } from './Confetti';
 import { Hud } from './Hud';
 import { NumberPop } from './NumberPop';
+import { useUiScale } from './scale';
 import { CORAL, CREAM, FONT, INK, SUN } from './theme';
 import { World } from './World';
 import { ArrowIcon, ENGINE_RATIO, Engine } from './worldArt';
@@ -38,8 +39,6 @@ type Props = {
   onExit: () => void;
 };
 
-const BELL = 76;
-
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -48,6 +47,8 @@ export function TrainScene({ task, session, settings, progress, onFinish, onExit
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const calm = settings.reducedMotion;
+  const s = useUiScale();
+  const BELL = 76 * s;
 
   const [track, setTrack] = useState(() => startTrack(task));
   const [phase, setPhase] = useState<Phase>('play');
@@ -88,15 +89,19 @@ export function TrainScene({ task, session, settings, progress, onFinish, onExit
   const left = insets.left + 12;
   const right = width - insets.right - 12;
   const bottom = height - insets.bottom - 12;
-  const firstStop = left + 44;
-  const gap = (right - 44 - firstStop) / task.last;
-  const stopX = (index: number) => firstStop + index * gap;
   const railY = height * 0.5;
-  const engine = clamp(Math.min(height * 0.25, (gap * 1.15) / ENGINE_RATIO), 44, 130);
-  const sign = clamp(Math.min(gap * 0.66, height * 0.13), 26, 56);
+  // Sized from a first guess at the spacing, then the ends are set back far
+  // enough that the engine is never cut off at the first or last stop.
+  const roughGap = (right - left - 88 * s) / task.last;
+  const engine = clamp(Math.min(height * 0.25, (roughGap * 1.15) / ENGINE_RATIO), 44, 130 * s);
+  const inset = Math.max(44 * s, (engine * ENGINE_RATIO) / 2 - 6);
+  const firstStop = left + inset;
+  const gap = (right - inset - firstStop) / task.last;
+  const stopX = (index: number) => firstStop + index * gap;
+  const sign = clamp(Math.min(gap * 0.66, height * 0.13), 26, 56 * s);
   const signY = railY + sign * 0.95;
-  const driveY = bottom - 78;
-  const countSize = clamp(engine * 0.5, 34, 52);
+  const driveY = bottom - 78 * s;
+  const countSize = clamp(engine * 0.5, 34, 52 * s);
 
   const x = useSharedValue(stopX(track.position));
   useEffect(() => {
@@ -217,12 +222,12 @@ export function TrainScene({ task, session, settings, progress, onFinish, onExit
         )}
       </Animated.View>
 
-      <View style={[styles.drive, { left, top: driveY }]}>
-        <ChunkyButton size={58} color="#fff" shade="#CFC7DE" label="Back one stop" onPress={() => drive(-1)} disabled={phase !== 'play'} quiet>
-          <ArrowIcon size={34} back />
+      <View style={[styles.drive, { left, top: driveY, gap: 14 * s }]}>
+        <ChunkyButton size={58 * s} color="#fff" shade="#CFC7DE" label="Back one stop" onPress={() => drive(-1)} disabled={phase !== 'play'} quiet>
+          <ArrowIcon size={34 * s} back />
         </ChunkyButton>
-        <ChunkyButton size={72} color={CORAL} shade="#C9492B" label="Forward one stop" onPress={() => drive(1)} disabled={phase !== 'play'} quiet>
-          <ArrowIcon size={44} />
+        <ChunkyButton size={72 * s} color={CORAL} shade="#C9492B" label="Forward one stop" onPress={() => drive(1)} disabled={phase !== 'play'} quiet>
+          <ArrowIcon size={44 * s} />
         </ChunkyButton>
       </View>
 
@@ -233,8 +238,8 @@ export function TrainScene({ task, session, settings, progress, onFinish, onExit
       <Hud
         left={left}
         top={insets.top + 6}
-        bottom={height - (insets.top + 12 + 38)}
-        captionLeft={left + 216}
+        bottom={height - (insets.top + 12 + 38 * s)}
+        captionLeft={left + 216 * s}
         captionWidth={width * 0.4}
         caption={caption}
         progress={progress}

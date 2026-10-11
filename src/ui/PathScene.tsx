@@ -18,12 +18,13 @@ import { PathTask, buildMaze, missesAllowed } from '../activity/pathGame';
 import { tapTile } from '../model/maze';
 import type { Attempt } from '../record/learningRecord';
 import type { Settings } from '../record/storage';
-import { numberWord, pathAsk, pathDone, pathPrompt } from '../voice/lines';
+import { numberWord, pathAsk, pathDone, pathPrompt, pathRemind } from '../voice/lines';
 import { playSound } from '../voice/sounds';
 import { hush, say } from '../voice/speak';
 import { Confetti } from './Confetti';
 import { Hud } from './Hud';
 import { NumberPop } from './NumberPop';
+import { useUiScale } from './scale';
 import { CORAL, CREAM, FONT, INK } from './theme';
 import { World } from './World';
 import { Dino } from './art';
@@ -56,6 +57,7 @@ export function PathScene({ task, session, settings, progress, onFinish, onExit 
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const calm = settings.reducedMotion;
+  const s = useUiScale();
   const maze = useMemo(() => buildMaze(task), [task]);
 
   // The highest number the path has reached so far.
@@ -92,7 +94,8 @@ export function PathScene({ task, session, settings, progress, onFinish, onExit 
 
   const left = insets.left + 12;
   const right = width - insets.right - 12;
-  const top = insets.top + 66;
+  // Leaves room above the top row for its popping numeral and goal marker.
+  const top = insets.top + 84 * s;
   const bottom = height - insets.bottom - 10;
   const cell = Math.min((right - left) / task.cols, (bottom - top) / task.rows);
   const gridX = left + (right - left - cell * task.cols) / 2;
@@ -194,7 +197,7 @@ export function PathScene({ task, session, settings, progress, onFinish, onExit 
 
   const replay = () => {
     stats.replays++;
-    speak(reached === 0 ? pathPrompt(task) : `What comes after ${numberWord(reached)}?`);
+    speak(reached === 0 ? pathPrompt(task) : pathRemind(task, reached));
   };
 
   const laid = LAID[task.traveller];
@@ -225,6 +228,7 @@ export function PathScene({ task, session, settings, progress, onFinish, onExit 
               style={[
                 styles.tile,
                 { width: tile, height: tile, borderRadius: tile * 0.24 },
+                index === goal && styles.goalTile,
                 onPath && { backgroundColor: laid, borderWidth: 3.5 },
                 isWrong && styles.wrong,
               ]}
@@ -234,8 +238,8 @@ export function PathScene({ task, session, settings, progress, onFinish, onExit 
               </Text>
             </Pressable>
             {index === goal && (
-              <View style={[styles.goal, { right: -tile * 0.14, top: -tile * 0.2 }]}>
-                <GoalIcon size={tile * 0.5} place={task.traveller} />
+              <View style={[styles.goal, { right: -tile * 0.1, top: -tile * 0.2 }]}>
+                <GoalIcon size={tile * 0.52} place={task.traveller} />
               </View>
             )}
           </Animated.View>
@@ -263,18 +267,26 @@ export function PathScene({ task, session, settings, progress, onFinish, onExit 
           burst={2}
           pop={reached > 0}
           reducedMotion={calm}
-          style={{ left: head.x - cell * 0.62, top: head.y - cell * 0.72 }}
+          style={{ left: head.x - cell * 0.56, top: head.y - cell * 0.66 }}
         />
       )}
 
       {celebrating && !calm && <Confetti x={head.x} y={head.y} spread={height * 0.55} />}
 
+      {/* Where the path starts and the number it has to reach, always in view. */}
+      <View style={[styles.journey, { right: width - right, top: insets.top + 8, gap: 8 * s, paddingHorizontal: 14 * s }]}>
+        <Text style={[styles.journeyText, { fontSize: 26 * s, lineHeight: 36 * s }]}>0</Text>
+        <Text style={[styles.journeyArrow, { fontSize: 22 * s, lineHeight: 36 * s }]}>➜</Text>
+        <GoalIcon size={34 * s} place={task.traveller} />
+        <Text style={[styles.journeyText, styles.journeyEnd, { fontSize: 34 * s, lineHeight: 40 * s }]}>{task.last}</Text>
+      </View>
+
       <Hud
         left={left}
         top={insets.top + 6}
-        bottom={height - (insets.top + 12 + 38)}
-        captionLeft={left + 190}
-        captionWidth={width * 0.5}
+        bottom={height - (insets.top + 12 + 38 * s)}
+        captionLeft={left + 190 * s}
+        captionWidth={width * 0.4}
         caption={caption}
         progress={progress}
         onExit={onExit}
@@ -298,6 +310,21 @@ const styles = StyleSheet.create({
   wrong: { borderColor: CORAL, borderStyle: 'dashed', borderWidth: 3.5 },
   number: { fontFamily: FONT.bold, color: INK, textAlign: 'center' },
   goal: { position: 'absolute', pointerEvents: 'none' },
+  // The last tile stands out from the start: a thick coral edge on a warm fill.
+  goalTile: { borderColor: CORAL, borderWidth: 5, backgroundColor: '#FFE9D6' },
+  journey: {
+    position: 'absolute',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 999,
+    borderWidth: 3,
+    borderColor: INK,
+    backgroundColor: '#fff',
+    pointerEvents: 'none',
+  },
+  journeyText: { fontFamily: FONT.bold, color: INK },
+  journeyArrow: { fontFamily: FONT.bold, color: INK, opacity: 0.6 },
+  journeyEnd: { color: CORAL },
   glow: {
     position: 'absolute',
     left: 0,

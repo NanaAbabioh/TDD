@@ -113,7 +113,12 @@ const TRAVELLERS = { train: 'the train', dragon: 'the dragon', dino: 'the dinosa
 export const WORLD_NAMES = { train: 'Trains', dragon: 'Dragons', dino: 'Dinosaurs' };
 
 export function pathPrompt(task: PathTask): string {
-  return `Help ${TRAVELLERS[task.traveller]} get to ${PLACES[task.traveller]}! Start at zero. What comes next?`;
+  return `Help ${TRAVELLERS[task.traveller]} get to ${PLACES[task.traveller]}, at number ${numberWord(task.last)}! Start at zero. What comes next?`;
+}
+
+// Said when the child asks to hear it again part-way along.
+export function pathRemind(task: PathTask, reached: number): string {
+  return `We are going to ${numberWord(task.last)}. What comes after ${numberWord(reached)}?`;
 }
 
 export function pathAsk(reached: number): string {

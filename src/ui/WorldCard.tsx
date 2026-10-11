@@ -12,6 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { playSound } from '../voice/sounds';
+import { useUiScale } from './scale';
 import { FONT, INK } from './theme';
 
 type Props = {
@@ -30,6 +31,7 @@ type Props = {
 const DEPTH = 8;
 
 export function WorldCard({ label, color, shade, width, height, jumps, still, onPress, children }: Props) {
+  const s = useUiScale();
   const lift = useSharedValue(0);
   useEffect(() => {
     if (jumps === 0 || still) return;
@@ -66,7 +68,7 @@ export function WorldCard({ label, color, shade, width, height, jumps, still, on
               ]}
             >
               <View style={styles.picture}>{children}</View>
-              <Text style={styles.label} numberOfLines={1}>
+              <Text style={[styles.label, { fontSize: 17 * s }]} numberOfLines={1}>
                 {label}
               </Text>
             </View>

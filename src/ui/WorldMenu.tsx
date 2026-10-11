@@ -10,6 +10,7 @@ import { HomeIcon } from './art';
 import { ChunkyButton } from './ChunkyButton';
 import { DinoActor } from './DinoActor';
 import type { Game, WorldId } from './PlayScreen';
+import { useUiScale } from './scale';
 import { FONT, INK } from './theme';
 import { World } from './World';
 import { WorldCard } from './WorldCard';
@@ -53,17 +54,19 @@ export function WorldMenu({ world, reducedMotion, voice, onPlay, onHome }: Props
     };
   }, []);
 
-  const cardW = Math.min((width - insets.left - insets.right) * 0.27, 250);
-  const cardH = Math.min(height * 0.56, cardW * 1.05);
-  const art = cardH * 0.66;
+  const s = useUiScale();
+  const cardW = Math.min((width - insets.left - insets.right) * 0.27, 250 * s);
+  // Taller cards on a squarer tablet screen.
+  const cardH = Math.min(height * 0.56, cardW * 1.35);
+  const art = Math.min(cardH * 0.66, cardW * 0.84);
   const titleSize = Math.min(height * 0.13, width * 0.06);
 
   return (
     <View style={styles.fill}>
       <World theme={look.scene} width={width} height={height} reducedMotion={reducedMotion} lush />
       <View style={{ position: 'absolute', left: insets.left + 12, top: insets.top + 6 }}>
-        <ChunkyButton size={48} color="#fff" shade="#CFC7DE" label="Home" onPress={onHome}>
-          <HomeIcon size={26} />
+        <ChunkyButton size={48 * s} color="#fff" shade="#CFC7DE" label="Home" onPress={onHome}>
+          <HomeIcon size={26 * s} />
         </ChunkyButton>
       </View>
       <View style={styles.titleWrap}>

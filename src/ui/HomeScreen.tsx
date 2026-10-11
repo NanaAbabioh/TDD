@@ -8,6 +8,7 @@ import { WELCOME } from '../voice/lines';
 import { Step, saySequence } from '../voice/speak';
 import { DinoActor } from './DinoActor';
 import type { WorldId } from './PlayScreen';
+import { useUiScale } from './scale';
 import { FONT, INK } from './theme';
 import { World } from './World';
 import { WorldCard } from './WorldCard';
@@ -69,9 +70,11 @@ export function HomeScreen({ reducedMotion, voice, onOpen, onParents }: Props) {
     };
   }, []);
 
-  const cardW = Math.min((width - insets.left - insets.right) * 0.27, 250);
-  const cardH = Math.min(height * 0.56, cardW * 1.05);
-  const art = cardH * 0.66;
+  const s = useUiScale();
+  const cardW = Math.min((width - insets.left - insets.right) * 0.27, 250 * s);
+  // Taller cards on a squarer tablet screen.
+  const cardH = Math.min(height * 0.56, cardW * 1.35);
+  const art = Math.min(cardH * 0.66, cardW * 0.84);
   const titleSize = Math.min(height * 0.115, width * 0.052);
 
   return (
@@ -100,7 +103,7 @@ export function HomeScreen({ reducedMotion, voice, onOpen, onParents }: Props) {
         delayLongPress={1500}
         style={[styles.parents, { right: insets.right + 16, bottom: insets.bottom + 8 }]}
       >
-        <Text style={styles.parentsText}>Grown-ups: press and hold</Text>
+        <Text style={[styles.parentsText, { fontSize: 12 * s }]}>Grown-ups: press and hold</Text>
       </Pressable>
     </View>
   );

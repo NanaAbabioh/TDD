@@ -2,6 +2,7 @@
 // targets stay large on a small phone and scale up on a tablet.
 
 import type { Task } from '../activity/tasks';
+import { uiScale } from './scale';
 
 export type Point = { x: number; y: number };
 export type Rect = { x: number; y: number; w: number; h: number };
@@ -23,10 +24,6 @@ export type SceneLayout = {
 };
 
 const PAD = 12;
-const TOP_BAR = 52;
-const BELL = 76;
-// Room under the supply mat for the adult's caption.
-const CAPTION = 44;
 const COLUMNS = 5;
 // Rows fill left to right, so the count tags read 1, 2, 3 in order.
 
@@ -41,6 +38,12 @@ function jitter(id: number, salt: number): number {
 }
 
 export function layoutScene(width: number, height: number, insets: Insets, task: Task): SceneLayout {
+  // Fixed-size parts grow on a tablet.
+  const s = uiScale(width, height);
+  const TOP_BAR = 52 * s;
+  const BELL = 76 * s;
+  // Room under the supply mat for the adult's caption.
+  const CAPTION = 44 * s;
   const left = insets.left + PAD;
   const right = width - insets.right - PAD;
   const top = insets.top + PAD;
@@ -58,7 +61,7 @@ export function layoutScene(width: number, height: number, insets: Insets, task:
 
   // Fewer dinosaurs stand taller; five still fit side by side.
   const receiver = Math.min(height * 0.33, areaW / (Math.max(count, 3) + 0.4));
-  const item = clamp(Math.min(height * 0.15, receiver * 0.6), 40, 84);
+  const item = clamp(Math.min(height * 0.15, receiver * 0.6), 40, 84 * s);
   const receiverY = top + receiver / 2;
   const receiverGap = receiver * 1.04;
   const receiverX = (index: number) =>
