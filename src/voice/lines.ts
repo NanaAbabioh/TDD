@@ -2,6 +2,7 @@
 // to another child: playful, but the number words stay exact. Each line is also shown as a
 // caption, and can later be swapped for a recording without touching the game.
 
+import type { AddTask } from '../activity/addGame';
 import type { DragonTask } from '../activity/dragonGame';
 import type { PathTask } from '../activity/pathGame';
 import type { Result, Task, Theme } from '../activity/tasks';
@@ -123,11 +124,36 @@ export function pathDone(task: PathTask, turn = 0): string {
   return `${sentence(numberWord(task.last))}! You made it to ${PLACES[task.traveller]}! ${PRAISE[turn % PRAISE.length]}`;
 }
 
+// The story of two groups coming together, told for each world.
+export function addPrompt(task: AddTask): string {
+  const first = numberWord(task.first);
+  const more = numberWord(task.more);
+  const one = task.first === 1;
+  const oneMore = task.more === 1;
+  if (task.world === 'train') {
+    return `${sentence(first)} ${one ? 'rider is' : 'riders are'} on the train. ${sentence(more)} more ${oneMore ? 'gets' : 'get'} on. How many riders now?`;
+  }
+  if (task.world === 'dragon') {
+    return `The dragon has ${first} ${one ? 'coin' : 'coins'}. Here ${oneMore ? 'comes' : 'come'} ${more} more. How many coins now?`;
+  }
+  return `${sentence(first)} ${one ? 'dinosaur is' : 'dinosaurs are'} at the picnic. ${sentence(more)} more ${oneMore ? 'comes' : 'come'} along. How many dinosaurs now?`;
+}
+
+export function addRight(task: AddTask, turn = 0): string {
+  const total = numberWord(task.first + task.more);
+  return `${sentence(numberWord(task.first))} and ${numberWord(task.more)} make ${total}! ${PRAISE[turn % PRAISE.length]}`;
+}
+
+export const ADD_COUNT = "Oops, not quite! Let's count them.";
+export const ADD_PICK = 'Pick a number first!';
+export const TRY_AGAIN = 'Now try again!';
+
 export const DONE_LINES = {
   dino: 'Yay! The picnic is ready! See you next time!',
   train: 'All aboard! See you next time!',
   dragon: 'The dragon is so happy! See you next time!',
   path: 'What a lot of counting! See you next time!',
+  add: 'So much adding! See you next time!',
 };
 
 // The home screen's welcome. Each world is named on its own, so its card can

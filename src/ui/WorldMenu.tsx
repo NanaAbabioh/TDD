@@ -1,4 +1,4 @@
-// The games inside one world. Every world has its own game and a Number Path.
+// The games inside one world: its own game, a Number Path and Adding Up.
 
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
@@ -13,7 +13,7 @@ import type { Game, WorldId } from './PlayScreen';
 import { FONT, INK } from './theme';
 import { World } from './World';
 import { WorldCard } from './WorldCard';
-import { Engine, PathArt } from './worldArt';
+import { AddArt, Engine, PathArt } from './worldArt';
 
 type Props = {
   world: WorldId;
@@ -32,14 +32,15 @@ const LOOK = {
 export function WorldMenu({ world, reducedMotion, voice, onPlay, onHome }: Props) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const [jumps, setJumps] = useState({ main: 0, path: 0 });
+  const [jumps, setJumps] = useState({ main: 0, path: 0, add: 0 });
   const look = LOOK[world];
 
   useEffect(() => {
-    let second: ReturnType<typeof setTimeout>;
+    const waves: ReturnType<typeof setTimeout>[] = [];
     const wave = () => {
-      setJumps((now) => ({ ...now, main: now.main + 1 }));
-      second = setTimeout(() => setJumps((now) => ({ ...now, path: now.path + 1 })), 160);
+      (['main', 'path', 'add'] as const).forEach((card, index) => {
+        waves.push(setTimeout(() => setJumps((now) => ({ ...now, [card]: now[card] + 1 })), index * 160));
+      });
     };
     let cancel = () => {};
     const delay = setTimeout(() => {
@@ -47,7 +48,7 @@ export function WorldMenu({ world, reducedMotion, voice, onPlay, onHome }: Props
     }, 500);
     return () => {
       clearTimeout(delay);
-      clearTimeout(second);
+      waves.forEach(clearTimeout);
       cancel();
     };
   }, []);
@@ -69,7 +70,7 @@ export function WorldMenu({ world, reducedMotion, voice, onPlay, onHome }: Props
         <Text style={[styles.title, styles.titleShadow, { fontSize: titleSize }]}>{WORLD_NAMES[world]}</Text>
         <Text style={[styles.title, { fontSize: titleSize }]}>{WORLD_NAMES[world]}</Text>
       </View>
-      <View style={[styles.row, { gap: width * 0.04 }]}>
+      <View style={[styles.row, { gap: width * 0.03 }]}>
         <WorldCard label={look.label} color={look.color} shade={look.shade} width={cardW} height={cardH} jumps={jumps.main} still={reducedMotion} onPress={() => onPlay(world)}>
           {world === 'train' ? (
             <Engine height={art * 0.82} happy={false} />
@@ -79,6 +80,9 @@ export function WorldMenu({ world, reducedMotion, voice, onPlay, onHome }: Props
         </WorldCard>
         <WorldCard label="Number Path" color="#FFE3B8" shade="#E0A04E" width={cardW} height={cardH} jumps={jumps.path} still={reducedMotion} onPress={() => onPlay('path')}>
           <PathArt size={art * 0.9} />
+        </WorldCard>
+        <WorldCard label="Adding Up" color="#FFD3C7" shade="#E0705A" width={cardW} height={cardH} jumps={jumps.add} still={reducedMotion} onPress={() => onPlay('add')}>
+          <AddArt size={art * 0.9} />
         </WorldCard>
       </View>
     </View>

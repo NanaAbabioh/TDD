@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
+import { ADD_SESSION_LENGTH, AddTask, nextAddTask } from '../activity/addGame';
 import { DRAGON_SESSION_LENGTH, DragonTask, nextDragonTask } from '../activity/dragonGame';
 import { PATH_SESSION_LENGTH, PathTask, nextPathTask } from '../activity/pathGame';
 import { nextTask, sessionLength } from '../activity/sequencer';
@@ -14,6 +15,7 @@ import { DONE_LINES } from '../voice/lines';
 import { playSound } from '../voice/sounds';
 import { say } from '../voice/speak';
 import { HomeIcon } from './art';
+import { AddScene } from './AddScene';
 import { ChunkyButton } from './ChunkyButton';
 import { Confetti } from './Confetti';
 import { DinoActor } from './DinoActor';
@@ -25,10 +27,10 @@ import { TrainScene } from './TrainScene';
 import { World } from './World';
 
 export type WorldId = 'dino' | 'train' | 'dragon';
-// Each world's own game, or the number path played in that world.
-export type Game = WorldId | 'path';
+// Each world's own game, or the number path or adding game played in that world.
+export type Game = WorldId | 'path' | 'add';
 
-type AnyTask = Task | TrainTask | DragonTask | PathTask;
+type AnyTask = Task | TrainTask | DragonTask | PathTask | AddTask;
 
 type Props = {
   world: WorldId;
@@ -48,6 +50,7 @@ function taskFor(
   if (game === 'train') return nextTrainTask(attempts, session, position);
   if (game === 'dragon') return nextDragonTask(attempts, session, position);
   if (game === 'path') return nextPathTask(attempts, session, position, world);
+  if (game === 'add') return nextAddTask(attempts, session, position, world);
   return nextTask(attempts, session, position);
 }
 
@@ -62,7 +65,9 @@ export function PlayScreen({ world, game, save, onAttempt, onExit }: Props) {
         ? DRAGON_SESSION_LENGTH
         : game === 'path'
           ? PATH_SESSION_LENGTH
-          : sessionLength(session);
+          : game === 'add'
+            ? ADD_SESSION_LENGTH
+            : sessionLength(session);
   const [step, setStep] = useState(() => ({
     position: 0,
     task: taskFor(world, game, save.attempts, session, 0),
@@ -126,6 +131,9 @@ export function PlayScreen({ world, game, save, onAttempt, onExit }: Props) {
   }
   if (game === 'dragon') {
     return <DragonScene key={step.position} task={step.task as DragonTask} {...shared} />;
+  }
+  if (game === 'add') {
+    return <AddScene key={step.position} task={step.task as AddTask} {...shared} />;
   }
   if (game === 'path') {
     return <PathScene key={step.position} task={step.task as PathTask} {...shared} />;

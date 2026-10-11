@@ -301,3 +301,19 @@ export function PathArt({ size }: { size: number }) {
     </Svg>
   );
 }
+
+// The picture on the adding game's door: two and one more.
+export function AddArt({ size }: { size: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 100 100">
+      {[
+        { x: 22, y: 30 },
+        { x: 22, y: 66 },
+      ].map((dot) => (
+        <Circle key={dot.y} cx={dot.x} cy={dot.y} r={14} fill={SUN} stroke={INK} strokeWidth={4} />
+      ))}
+      <Path d="M44 48 L62 48 M53 39 L53 57" stroke={INK} strokeWidth={7} strokeLinecap="round" />
+      <Circle cx={81} cy={48} r={14} fill={CORAL} stroke={INK} strokeWidth={4} />
+    </Svg>
+  );
+}
