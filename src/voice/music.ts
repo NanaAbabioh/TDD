@@ -7,10 +7,10 @@ import { Platform } from 'react-native';
 export type Track = 'home' | 'dino' | 'train' | 'dragon';
 
 const SOURCES: Record<Track, number> = {
-  home: require('../../assets/sounds/music-home.wav'),
-  dino: require('../../assets/sounds/music-dino.wav'),
-  train: require('../../assets/sounds/music-train.wav'),
-  dragon: require('../../assets/sounds/music-dragon.wav'),
+  home: require('../../assets/sounds/music-home.m4a'),
+  dino: require('../../assets/sounds/music-dino.m4a'),
+  train: require('../../assets/sounds/music-train.m4a'),
+  dragon: require('../../assets/sounds/music-dragon.m4a'),
 };
 
 const VOLUME = 0.22;
