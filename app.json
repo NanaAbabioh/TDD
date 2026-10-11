@@ -1,13 +1,14 @@
 {
   "expo": {
-    "name": "Dino Picnic",
-    "slug": "dino-picnic",
+    "name": "TDD Numbers",
+    "slug": "tdd-numbers",
     "version": "1.0.0",
     "orientation": "landscape",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nanaababioh.tdd"
     },
     "android": {
       "adaptiveIcon": {
@@ -16,7 +17,11 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.nanaababioh.tdd",
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,6 +37,12 @@
         }
       ],
       "expo-asset"
-    ]
+    ],
+    "owner": "nana_ababioh",
+    "extra": {
+      "eas": {
+        "projectId": "070de655-f6c9-4ea3-a321-500884b5a0ad"
+      }
+    }
   }
 }
