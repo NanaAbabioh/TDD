@@ -245,8 +245,20 @@ export function LidIcon({ size }: { size: number }) {
   );
 }
 
-// Where the number path ends: a little station for the train, a nest for the dragon.
-export function GoalIcon({ size, nest }: { size: number; nest: boolean }) {
+// Where the number path ends: a station for the train, a nest for the dragon,
+// a picnic basket for the dinosaur.
+export function GoalIcon({ size, place }: { size: number; place: 'train' | 'dragon' | 'dino' }) {
+  if (place === 'dino') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 100 100">
+        <Path d="M24 50 Q50 2 76 50" stroke="#8F5A20" strokeWidth={7} strokeLinecap="round" fill="none" />
+        <Path d="M10 46 L90 46 L80 88 Q50 96 20 88 Z" fill="#E2AC55" stroke="#8F5A20" strokeWidth={4} strokeLinejoin="round" />
+        <Path d="M16 62 L84 62 M20 76 L80 76 M38 46 L40 92 M62 46 L60 92" stroke="#8F5A20" strokeWidth={3} opacity={0.6} />
+        <Path d="M30 46 Q38 26 50 40 Q58 22 70 46 Z" fill="#6CCB6B" stroke="#2C7F47" strokeWidth={3} strokeLinejoin="round" />
+      </Svg>
+    );
+  }
+  const nest = place === 'dragon';
   if (nest) {
     return (
       <Svg width={size} height={size} viewBox="0 0 100 100">

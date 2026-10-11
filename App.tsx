@@ -11,13 +11,19 @@ import { HomeScreen } from './src/ui/HomeScreen';
 import { setMusic } from './src/voice/music';
 import { setSoundEnabled } from './src/voice/sounds';
 import { ParentScreen } from './src/ui/ParentScreen';
-import { Game, PlayScreen } from './src/ui/PlayScreen';
+import { Game, PlayScreen, WorldId } from './src/ui/PlayScreen';
+import { WorldMenu } from './src/ui/WorldMenu';
 
-type Screen = 'home' | 'parents' | Game;
+// Home shows the three worlds; a world shows its games; a game is played inside its world.
+type Screen =
+  | { name: 'home' }
+  | { name: 'parents' }
+  | { name: 'world'; world: WorldId }
+  | { name: 'play'; world: WorldId; game: Game };
 
 export default function App() {
   const [save, setSave] = useState<SaveData>();
-  const [screen, setScreen] = useState<Screen>('home');
+  const [screen, setScreen] = useState<Screen>({ name: 'home' });
   const [fontsReady] = useFonts({ Fredoka_500Medium, Fredoka_600SemiBold, Fredoka_700Bold });
 
   useEffect(() => {
@@ -32,8 +38,8 @@ export default function App() {
   }, [soundOn]);
   useEffect(() => {
     if (!musicOn) return setMusic(undefined);
-    // The number path borrows the train's music.
-    setMusic(screen === 'parents' ? 'home' : screen === 'path' ? 'train' : screen);
+    // A world's menu and all its games share that world's track.
+    setMusic('world' in screen ? screen.world : 'home');
   }, [musicOn, screen]);
 
   const update = (next: SaveData) => {
@@ -58,29 +64,40 @@ export default function App() {
       <SafeAreaProvider>
         <StatusBar hidden />
         {!ready && <View style={{ flex: 1, backgroundColor: '#DFF7EC' }} />}
-        {ready && screen === 'home' && (
+        {ready && screen.name === 'home' && (
           <HomeScreen
             reducedMotion={save.settings.reducedMotion}
             voice={save.settings.voice}
-            onPlay={setScreen}
-            onParents={() => setScreen('parents')}
+            onOpen={(world) => setScreen({ name: 'world', world })}
+            onParents={() => setScreen({ name: 'parents' })}
           />
         )}
-        {ready && screen !== 'home' && screen !== 'parents' && (
+        {ready && screen.name === 'world' && (
+          <WorldMenu
+            key={screen.world}
+            world={screen.world}
+            reducedMotion={save.settings.reducedMotion}
+            voice={save.settings.voice}
+            onPlay={(game) => setScreen({ name: 'play', world: screen.world, game })}
+            onHome={() => setScreen({ name: 'home' })}
+          />
+        )}
+        {ready && screen.name === 'play' && (
           <PlayScreen
-            key={screen}
-            game={screen}
+            key={`${screen.world}-${screen.game}`}
+            world={screen.world}
+            game={screen.game}
             save={save}
             onAttempt={recordAttempt}
-            onExit={() => setScreen('home')}
+            onExit={() => setScreen({ name: 'world', world: screen.world })}
           />
         )}
-        {ready && screen === 'parents' && (
+        {ready && screen.name === 'parents' && (
           <ParentScreen
             save={save}
             onSettings={(settings: Settings) => update({ ...save, settings })}
             onReset={() => update({ ...emptySave(), settings: save.settings })}
-            onBack={() => setScreen('home')}
+            onBack={() => setScreen({ name: 'home' })}
           />
         )}
       </SafeAreaProvider>

@@ -26,6 +26,7 @@ import { Hud } from './Hud';
 import { NumberPop } from './NumberPop';
 import { CORAL, CREAM, FONT, INK } from './theme';
 import { World } from './World';
+import { Dino } from './art';
 import { Dragon, ENGINE_RATIO, Engine, GoalIcon } from './worldArt';
 
 type Props = {
@@ -37,7 +38,8 @@ type Props = {
   onExit: () => void;
 };
 
-const LAID = { train: '#FFD45C', dragon: '#D3B4F2' };
+const LAID = { train: '#FFD45C', dragon: '#D3B4F2', dino: '#BFEBAE' };
+const SCENE = { train: 'train', dragon: 'dragon', dino: 'leaves' } as const;
 
 // The tile to try next, shown gently after two misses on the same step.
 function Glow({ size, still }: { size: number; still: boolean }) {
@@ -184,7 +186,7 @@ export function PathScene({ task, session, settings, progress, onFinish, onExit 
     setCelebrating(true);
     later(900, () => {
       playSound(task.traveller === 'train' ? 'whistle' : 'success');
-      if (task.traveller === 'dragon') playSound('cheer');
+      if (task.traveller !== 'train') playSound('cheer');
     });
     later(1900, () => speak(pathDone(task, progress.position + task.last)));
     later(7200, finish);
@@ -201,7 +203,7 @@ export function PathScene({ task, session, settings, progress, onFinish, onExit 
 
   return (
     <Animated.View entering={calm ? undefined : FadeIn.duration(280)} style={styles.fill}>
-      <World theme={task.traveller === 'train' ? 'train' : 'dragon'} width={width} height={height} reducedMotion={calm} />
+      <World theme={SCENE[task.traveller]} width={width} height={height} reducedMotion={calm} />
 
       {maze.values.map((value, index) => {
         const spot = centre(index);
@@ -233,7 +235,7 @@ export function PathScene({ task, session, settings, progress, onFinish, onExit 
             </Pressable>
             {index === goal && (
               <View style={[styles.goal, { right: -tile * 0.14, top: -tile * 0.2 }]}>
-                <GoalIcon size={tile * 0.5} nest={task.traveller === 'dragon'} />
+                <GoalIcon size={tile * 0.5} place={task.traveller} />
               </View>
             )}
           </Animated.View>
@@ -245,8 +247,10 @@ export function PathScene({ task, session, settings, progress, onFinish, onExit 
           <View style={{ width: mover, height: mover, alignItems: 'center', justifyContent: 'center' }}>
             <Engine height={mover / ENGINE_RATIO} happy={celebrating} />
           </View>
-        ) : (
+        ) : task.traveller === 'dragon' ? (
           <Dragon size={mover} mood={celebrating ? 'happy' : 'idle'} />
+        ) : (
+          <Dino size={mover} variant={0} mood={celebrating ? 'happy' : 'idle'} />
         )}
       </Animated.View>
 

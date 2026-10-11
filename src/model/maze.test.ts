@@ -66,8 +66,8 @@ describe('number path', () => {
 
   it('moves up a level only after a path is found without help', () => {
     expect(pathLevel([]).last).toBe(5);
-    expect(nextPathTask([], 1, 0)).toMatchObject({ last: 5, support: 'supported' });
-    expect(nextPathTask([done(5, 'supported')], 1, 1)).toMatchObject({ last: 5, support: 'independent' });
+    expect(nextPathTask([], 1, 0, 'dino')).toMatchObject({ last: 5, support: 'supported', traveller: 'dino' });
+    expect(nextPathTask([done(5, 'supported')], 1, 1, 'train')).toMatchObject({ last: 5, support: 'independent' });
     expect(pathLevel([done(5, 'independent')]).last).toBe(10);
     const all = PATH_LEVELS.map((level) => done(level.last, 'independent'));
     expect(pathLevel(all).last).toBe(50);

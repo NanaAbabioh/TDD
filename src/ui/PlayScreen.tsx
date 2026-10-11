@@ -24,25 +24,34 @@ import { FONT, INK } from './theme';
 import { TrainScene } from './TrainScene';
 import { World } from './World';
 
-export type Game = 'dino' | 'train' | 'dragon' | 'path';
+export type WorldId = 'dino' | 'train' | 'dragon';
+// Each world's own game, or the number path played in that world.
+export type Game = WorldId | 'path';
 
 type AnyTask = Task | TrainTask | DragonTask | PathTask;
 
 type Props = {
+  world: WorldId;
   game: Game;
   save: SaveData;
   onAttempt: (attempt: Attempt) => void;
   onExit: () => void;
 };
 
-function taskFor(game: Game, attempts: readonly Attempt[], session: number, position: number): AnyTask {
+function taskFor(
+  world: WorldId,
+  game: Game,
+  attempts: readonly Attempt[],
+  session: number,
+  position: number,
+): AnyTask {
   if (game === 'train') return nextTrainTask(attempts, session, position);
   if (game === 'dragon') return nextDragonTask(attempts, session, position);
-  if (game === 'path') return nextPathTask(attempts, session, position);
+  if (game === 'path') return nextPathTask(attempts, session, position, world);
   return nextTask(attempts, session, position);
 }
 
-export function PlayScreen({ game, save, onAttempt, onExit }: Props) {
+export function PlayScreen({ world, game, save, onAttempt, onExit }: Props) {
   const { width, height } = useWindowDimensions();
   const calm = save.settings.reducedMotion;
   const session = useRef(save.sessions + 1).current;
@@ -56,7 +65,7 @@ export function PlayScreen({ game, save, onAttempt, onExit }: Props) {
           : sessionLength(session);
   const [step, setStep] = useState(() => ({
     position: 0,
-    task: taskFor(game, save.attempts, session, 0),
+    task: taskFor(world, game, save.attempts, session, 0),
   }));
   const done = step.position >= length;
 
@@ -70,7 +79,7 @@ export function PlayScreen({ game, save, onAttempt, onExit }: Props) {
     const attempts = attempt ? [...save.attempts, attempt] : save.attempts;
     if (attempt) onAttempt(attempt);
     const position = step.position + 1;
-    setStep({ position, task: taskFor(game, attempts, session, position) });
+    setStep({ position, task: taskFor(world, game, attempts, session, position) });
   };
 
   if (done) {
@@ -78,7 +87,7 @@ export function PlayScreen({ game, save, onAttempt, onExit }: Props) {
     return (
       <View style={styles.done}>
         <World
-          theme={game === 'dragon' ? 'dragon' : game === 'dino' ? 'cups' : 'train'}
+          theme={world === 'dragon' ? 'dragon' : world === 'dino' ? 'cups' : 'train'}
           width={width}
           height={height}
           reducedMotion={calm}
@@ -92,7 +101,7 @@ export function PlayScreen({ game, save, onAttempt, onExit }: Props) {
               variant={variant}
               mood="happy"
               reducedMotion={calm}
-              dragon={(game === 'dragon' || game === 'path') && variant === 1}
+              dragon={world === 'dragon' && variant === 1}
             />
           ))}
         </View>

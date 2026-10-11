@@ -106,11 +106,13 @@ export function dragonFeedback(task: DragonTask, correct: boolean, given: number
   return `${word} ${task.treasure}! ${praise}`;
 }
 
-const PLACES = { train: 'the station', dragon: 'the nest' };
+const PLACES = { train: 'the station', dragon: 'the nest', dino: 'the picnic' };
+const TRAVELLERS = { train: 'the train', dragon: 'the dragon', dino: 'the dinosaur' };
+
+export const WORLD_NAMES = { train: 'Trains', dragon: 'Dragons', dino: 'Dinosaurs' };
 
 export function pathPrompt(task: PathTask): string {
-  const who = task.traveller === 'train' ? 'the train' : 'the dragon';
-  return `Help ${who} get to ${PLACES[task.traveller]}! Start at zero. What comes next?`;
+  return `Help ${TRAVELLERS[task.traveller]} get to ${PLACES[task.traveller]}! Start at zero. What comes next?`;
 }
 
 export function pathAsk(reached: number): string {

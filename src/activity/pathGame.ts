@@ -5,7 +5,8 @@ import { Maze, generateMaze } from '../model/maze';
 import { Attempt, hasFirstCorrect, independentSuccesses } from '../record/learningRecord';
 import type { Support } from './tasks';
 
-export type Traveller = 'train' | 'dragon';
+// The world the path is played in decides who travels it.
+export type Traveller = 'train' | 'dragon' | 'dino';
 
 export type PathTask = {
   skill: 'path';
@@ -49,14 +50,19 @@ export function pathLevel(attempts: readonly Attempt[]) {
   );
 }
 
-export function nextPathTask(attempts: readonly Attempt[], session: number, position: number): PathTask {
+export function nextPathTask(
+  attempts: readonly Attempt[],
+  session: number,
+  position: number,
+  traveller: Traveller,
+): PathTask {
   const level = pathLevel(attempts);
   const support = hasFirstCorrect(attempts, level.last, SKILL) ? 'independent' : 'supported';
   return {
     skill: SKILL,
     ...level,
     support,
-    traveller: (session + position) % 2 === 0 ? 'train' : 'dragon',
+    traveller,
     seed: session * 7919 + position * 104729 + level.last,
   };
 }
